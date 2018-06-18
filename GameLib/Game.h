@@ -32,14 +32,16 @@ public:
 				end = true;
 			}
 			else {
-				int x;
+				int x = 0;
 				myPacket >> x;
 				Protocol prot = (Protocol)x;
+				cout << prot << endl;
 				switch (prot)
 				{
 				case utils::TURN:
 					break;
 				case utils::MSG:
+					cout << "Mensaje recibido" << endl;
 					myPacket >> message.first >> message.second;
 					mu.lock();
 					aMsj->push_back(message);
@@ -165,8 +167,6 @@ public:
 			window.display();
 			window.clear();
 		}
-
-		socket->disconnect();
 
 		t.join();
 	}
