@@ -15,8 +15,9 @@ int main() {
 	sf::TcpListener listener;
 	sf::IpAddress ip = sf::IpAddress::getLocalAddress();
 	sf::SocketSelector selector;
-	Protocol prot;
 	bool userDisconected = false;
+	pair<string, string> message;
+	vector<pair<string, string>> aMsj;
 
 #pragma region Connection
 	//ESTABLECER CONEXION
@@ -107,7 +108,14 @@ int main() {
 						switch (prot) {
 						case CONSTRUCTION:
 							break;
-						case ENDTURN:
+						case MSG:
+							pck >> message.first >> message.second;
+							aMsj.push_back(message);
+							if (aMsj.size() > 25) {
+								aMsj.erase(aMsj.begin(), aMsj.begin() + 1);
+							}
+							sendPack << message.first << message.second;
+							// TODOOOOO
 							break;
 						case DISCONNECT:
 							msg = "El jugador " + std::to_string(i) + " - " + socks[i].second.nick + " se ha desconectado.";

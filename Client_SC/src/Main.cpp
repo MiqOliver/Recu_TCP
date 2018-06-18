@@ -8,6 +8,7 @@
 #include <Map.hpp>
 #include <Player.hpp>
 #include "Renderer.hpp"
+#include <Game.h>
 
 using namespace utils;
 
@@ -81,8 +82,10 @@ void main() {
 	pck.clear();
 #pragma endregion
 
+	Game myGame = Game(&sock);
 
-	cin >> nick;
+	myGame.Run();
+	
 #pragma region Disconnect
 	sf::Packet chaoPck;
 	chaoPck << (int)prot;
@@ -91,5 +94,6 @@ void main() {
 	else {
 		cout << "Informacion de desconexion enviada al Server" << endl;
 	}
+	sock.disconnect();
 #pragma endregion
 }

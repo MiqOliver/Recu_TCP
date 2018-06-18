@@ -35,10 +35,6 @@ public:
 							switch (prot) {
 							case INFOPLAYER:
 								break;
-							case RECURSOS:
-								break;
-							case LADRON:
-								break;
 							case DEAL:
 								break;
 							case CONSTRUCTION:

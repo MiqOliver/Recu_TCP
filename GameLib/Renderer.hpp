@@ -60,7 +60,7 @@ public:
 	}
 
 	inline void CreateWindow() {
-		window.create(VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Catan");
+		window.create(VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "TCP");
 		Image icon;
 		icon.loadFromFile(MAP_0);
 		window.setIcon(64, 74, icon.getPixelsPtr());

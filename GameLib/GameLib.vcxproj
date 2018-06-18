@@ -130,8 +130,10 @@
   <ItemGroup>
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Direction.hpp" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Map.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Receptor.h" />
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
