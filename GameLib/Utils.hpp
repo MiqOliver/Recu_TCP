@@ -38,7 +38,7 @@ namespace graphics {
 
 namespace utils {
 
-	enum Protocol { INFOPLAYER, MAPA, RECURSOS, LADRON, YOURTURN, 
+	enum Protocol { INFOPLAYER, INFOENEMY, START, TURN, 
 		DICE, DEAL, RESOURCES, CONSTRUCTION, POINTS, LOGRO, ENDTURN, 
 		CONNECTIONFAILURE, STRUCTURES, CARDS, ENDGAME, ERROR, DISCONNECT };
 
@@ -50,6 +50,8 @@ namespace utils {
 	static std::string nick;
 
 	std::string msg = "";
+	static bool myTurn = false;
+	static int playerTurn = 0;
 
 	Protocol prot;
 

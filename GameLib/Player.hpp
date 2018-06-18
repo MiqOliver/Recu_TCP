@@ -11,12 +11,7 @@ public:
 																							ip(_ip),
 																							port(_port),
 																							id(_id) {
-		cards[STEEL] = 0;
-		cards[WOOD] = 0;
-		cards[CLAY] = 0;
-		cards[SHEEP] = 0;
-		cards[STRAW] = 0;
-		points = 0;
+		
 	}
 
 	Player() = default;
@@ -25,7 +20,18 @@ public:
 	std::string ip;
 	unsigned short port;
 	unsigned short id;
-	std::map<Resource, int> cards;
-	int points = 0;
+	int life = 100;
+	int attack = 10;
+	int mAttack = 15;
+
 };	
+
+class Enemy {
+public:
+	Enemy() = default;
+
+	int life = 300;
+	int attack = 30;
+	int mAttack = 30;
+};
 
