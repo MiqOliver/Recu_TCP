@@ -1,7 +1,7 @@
 #include <SFML\Network.hpp>
 #include <iostream>
 #include "Direction.h"
-#include "Utils.h"
+#include "Utils.hpp"
 
 void main() {
 	//ESTABLECER CONEXION

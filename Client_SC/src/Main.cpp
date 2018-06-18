@@ -9,7 +9,6 @@
 #include <Player.hpp>
 #include "Renderer.hpp"
 
-using namespace std;
 using namespace utils;
 
 void main() {
@@ -19,6 +18,7 @@ void main() {
 	vector<Player> players;
 	Player myPlayer = Player();
 
+	nick = "";
 	std::cout << "Enter your NickName:" << endl;
 	std::cin >> nick;
 
@@ -56,8 +56,8 @@ void main() {
 
 	R.CreateWindow();
 	R.SetVariables(&myTurn);
-	//thread draw(R);
 	
+
 #pragma region Loop
 
 	while (R.IsOpen()) {
@@ -65,7 +65,6 @@ void main() {
 		while (firstTurns < 2) {
 			if (myTurn) {
 				sf::Packet packBuild;
-				Protocol prot;
 				Structures build;
 				prot = utils::CONSTRUCTION;
 				build = utils::TOWN;
@@ -110,6 +109,18 @@ void main() {
 
 		}
 		R.Draw();
+	}
+#pragma endregion
+
+
+	cin >> nick;
+#pragma region Disconnect
+	sf::Packet chaoPck;
+	chaoPck << (int)prot;
+	if (sock.send(chaoPck) != sf::Socket::Done)
+		cout << "No se pudo enviar la desconexion al Server" << endl;
+	else {
+		cout << "Informacion de desconexion enviada al Server" << endl;
 	}
 #pragma endregion
 

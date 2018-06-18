@@ -1,5 +1,8 @@
 #pragma once
 #include <mutex>
+#include <vector>
+
+using namespace std;
 
 namespace graphics {
 
@@ -37,7 +40,7 @@ namespace utils {
 
 	enum Protocol { INFOPLAYER, MAPA, RECURSOS, LADRON, YOURTURN, 
 		DICE, DEAL, RESOURCES, CONSTRUCTION, POINTS, LOGRO, ENDTURN, 
-		CONNECTIONFAILURE, STRUCTURES, CARDS, ENDGAME, ERROR };
+		CONNECTIONFAILURE, STRUCTURES, CARDS, ENDGAME, ERROR, DISCONNECT };
 
 	enum Resource { WOOD, SHEEP, STRAW, STEEL, CLAY, DESERT };
 
@@ -45,6 +48,10 @@ namespace utils {
 
 	static std::mutex mu;
 	static std::string nick;
+
+	std::string msg = "";
+
+	Protocol prot;
 
 	#define PORT 5000
 	#define MAX_PLAYERS 4
@@ -67,6 +74,8 @@ namespace utils {
 	#define MAX_CITY 4
 	#define MAX_BRIDGE 15
 
-	#define MINE_COLOR sf::Color(0, 160, 0)
-	#define OTHER_COLOR sf::Color(0, 160, 160)
+	#define MINE_COLOR sf::Color(0, 160, 0) 
+	#define COLOR_0 sf::Color(0, 160, 160) 
+	#define COLOR_1 sf::Color(160, 0, 0) 
+	#define COLOR_2 sf::Color(200, 200, 200)
 }

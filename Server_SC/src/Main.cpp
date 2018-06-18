@@ -94,10 +94,11 @@ int main() {
 			cout << "No se pudo conectar al socket" << endl;
 		}
 		//Nickname
-		char receivedText[MAX_LENGTH];
+		char receivedText[MAX_LENGTH] = {""};
 		size_t receivedLength;
 		sock->receive(receivedText, MAX_LENGTH, receivedLength);
-		string nick = receivedText;
+		string nick = "";
+		nick = receivedText;
 		Player p(nick, sock->getRemoteAddress().toString(), sock->getRemotePort(), i);
 		cout << "Socket " << p.id << ": NAME - " << nick  << endl;
 
@@ -346,11 +347,15 @@ int main() {
 				if (selector.isReady(*socks[i].first)) {
 					sf::Packet myPack;
 					sf::Socket::Status status = socks[i].first->receive(myPack);
-					if (status == sf::Socket::Done) {
+					if (status == sf::Socket::NotReady) {
+						break;
+					}
+					else if (status == sf::Socket::Done) {
 						int p;
 						myPack >> p;
 						prot = (Protocol)p;
 						sf::Packet sendPack;
+						int num = 6;
 						switch (prot) {
 						case CONSTRUCTION:
 							Structures build;
@@ -397,7 +402,6 @@ int main() {
 							if (playerTurn == 4)
 								playerTurn = 0;
 							socks[playerTurn].first->send(sendPack);
-							int num = 6;
 							for (int j = 0; j < MAX_PLAYERS; j++) {
 								CalculateResources(num, myMap.nodes, &socks[j].second);
 								prot = RECURSOS;
@@ -407,13 +411,33 @@ int main() {
 								socks[j].first->send(sendRec);
 							}
 							break;
+						case DISCONNECT:
+							msg = "El jugador " + std::to_string(i) + " - " + socks[i].second.nick + " se ha desconectado.";
+
+							selector.remove(*socks[i].first);
+							socks[i].first->disconnect();
+							socks.erase(socks.begin() + i);
+							std::cout << "Elimino el socket que se ha desconectado" << endl;
+							for each (pair<sf::TcpSocket*, Player> s in socks) {
+								s.first->send(msg.c_str(), msg.length());
+								std::cout << "Se envia desconexión al player " << s.second.id << " - " << s.second.nick;
+							}
+							msg = "";
+							break;
 						}
 					}
 					else if (status == sf::Socket::Disconnected) {
+						msg = "El jugador " + std::to_string(i) + " - " + socks[i].second.nick + " se ha desconectado.";
+
 						selector.remove(*socks[i].first);
 						socks[i].first->disconnect();
 						socks.erase(socks.begin() + i);
 						std::cout << "Elimino el socket que se ha desconectado" << endl;
+						for each (pair<sf::TcpSocket*, Player> s in socks) {
+							s.first->send(msg.c_str(), msg.length());
+							std::cout << "Se envia desconexión al player " << s.second.id << " - " << s.second.nick;
+						}
+						msg = "";
 						break;
 					}
 					else {
@@ -423,6 +447,14 @@ int main() {
 			}
 		}
 	}
+#pragma endregion
+
+#pragma region LiberaMemoria
+	selector.clear();
+	for each (pair<sf::TcpSocket*, Player> s in socks) {
+		s.first->disconnect();
+	}
+	socks.clear();
 #pragma endregion
 
 	return 0;

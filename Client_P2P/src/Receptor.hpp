@@ -2,7 +2,7 @@
 #include <SFML\Network.hpp>
 #include <iostream>
 #include <mutex>
-#include "Utils.h"
+#include "Utils.hpp"
 
 using namespace utils;
 using namespace std;
