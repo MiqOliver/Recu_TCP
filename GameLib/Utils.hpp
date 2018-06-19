@@ -49,6 +49,7 @@ namespace utils {
 	static std::mutex mu;
 	static std::string nick;
 
+	static bool end = false;
 	std::string msg = "";
 	static bool myTurn = false;
 	static int playerTurn = 0;

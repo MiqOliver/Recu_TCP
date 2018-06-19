@@ -24,18 +24,18 @@ public:
 	}
 
 	void operator() () {
-		bool end = false;
-		while (!end) {
+		while (!utils::end) {
+			myPacket.clear();
 			sf::Socket::Status status = sock->receive(myPacket);
 			if (status != sf::Socket::Done) {
 				cout << "Ha fallado la recepcion de datos\n";
-				end = true;
+				utils::end = true;
 			}
 			else {
 				int x = 0;
 				myPacket >> x;
 				Protocol prot = (Protocol)x;
-				cout << prot << endl;
+				cout << (int)prot << endl;
 				switch (prot)
 				{
 				case utils::TURN:
@@ -48,13 +48,14 @@ public:
 					if (aMsj->size() > 25) {
 						aMsj->erase(aMsj->begin(), aMsj->begin() + 1);
 					}
+					message.first = "";
+					message.second = "";
 					mu.unlock();
 					break;
 				default:
 					break;
 				}
 			}
-			myPacket.clear();
 		}
 	}
 };
@@ -109,28 +110,37 @@ public:
 			while (window.pollEvent(evento)) {
 				switch (evento.type) {
 				case sf::Event::Closed:
+					prot = DISCONNECT;
+					myPacket << (int)prot;
+					socket->send(myPacket);
 					window.close();
+					myPacket.clear();
+					utils::end = true;
 					break;
 				case sf::Event::KeyPressed:
 					if (evento.key.code == sf::Keyboard::Escape)
 						window.close();
 					else if (evento.key.code == sf::Keyboard::Return) {
 						if (mensaje == " > exit") {
-							messageSend = mensaje;
-							myPacket << nick << messageSend;
+							prot = DISCONNECT;
+							myPacket << (int)prot;
 							socket->send(myPacket);
 							window.close();
+							myPacket.clear();
+							utils::end = true;
 						}
 						else {
 							prot = MSG;
 							//SEND
 							messageSend = mensaje;
-							myPacket << prot << nick << messageSend;
+
+							myPacket << (int)prot << nick << messageSend;
 							sf::Socket::Status status = socket->send(myPacket);
 							if (status != sf::Socket::Done) {
 								cout << "Ha fallado el envio de datos\n";
 							}
 							mensaje = " > ";
+							myPacket.clear();
 						}
 					}
 					break;

@@ -53,10 +53,10 @@ int main() {
 
 #pragma region StartGame
 	// Se intercambia datos iniciales con otros jugadores
-	for (int i = 0; i < MAX_PLAYERS; i++) {
+	for (int i = 0; i < socks.size(); i++) {
 		prot = INFOPLAYER;
 		pck << (int)prot;
-		for (int j = 0; j < MAX_PLAYERS; j++) {
+		for (int j = 0; j < socks.size(); j++) {
 			pck << socks[j].second.nick << socks[j].second.id << socks[j].second.life << socks[j].second.attack << socks[j].second.mAttack;
 		}
 		if (socks[i].first->send(pck) != sf::Socket::Done)
@@ -67,7 +67,7 @@ int main() {
 	pck.clear();
 
 	// El servidor indica la situación inicial
-	for (int i = 0; i < MAX_PLAYERS; i++) {
+	for (int i = 0; i < socks.size(); i++) {
 		prot = INFOENEMY;
 		pck << (int)prot << myEnemy.life << myEnemy.attack << myEnemy.mAttack;
 		if (socks[i].first->send(pck) != sf::Socket::Done)
@@ -78,7 +78,7 @@ int main() {
 	pck.clear();
 
 	// El servidor marca el inicio de partida
-	for (int i = 0; i < MAX_PLAYERS; i++) {
+	for (int i = 0; i < socks.size(); i++) {
 		prot = START;
 		pck << (int)prot << playerTurn;
 		if (socks[i].first->send(pck) != sf::Socket::Done)
@@ -109,36 +109,43 @@ int main() {
 						case CONSTRUCTION:
 							break;
 						case MSG:
-							pck >> message.first >> message.second;
+							myPack >> message.first >> message.second;
 							aMsj.push_back(message);
 							if (aMsj.size() > 25) {
 								aMsj.erase(aMsj.begin(), aMsj.begin() + 1);
 							}
+							//cout << "Mensaje: " << message.first << " - " << message.second << " - " << (int)prot << endl;
 							sendPack << (int)prot << message.first << message.second;
-
-							for (int i = 0; i < MAX_PLAYERS; i++) {
-								if (socks[i].first->send(pck) != sf::Socket::Done)
+							for (int i = 0; i < socks.size(); i++) {
+								if (socks[i].first->send(myPack) != sf::Socket::Done)
 									cout << "No se pudo enviar el mensaje al Socket " << i << endl;
 								else
 									cout << "Mensaje enviado al Socket " << i << endl;
 							}
+							message.first = "";
+							message.second = "";
 							pck.clear();
+							sendPack.clear();
 							break;
 						case DISCONNECT:
+							prot = MSG;
 							msg = "El jugador " + std::to_string(i) + " - " + socks[i].second.nick + " se ha desconectado.";
+							sendPack << (int)prot << msg;
 
 							selector.remove(*socks[i].first);
 							socks[i].first->disconnect();
 							socks.erase(socks.begin() + i);
 							std::cout << "Elimino el socket que se ha desconectado" << endl;
-							for (int i = 0; i < MAX_PLAYERS; i++) {
-								if (socks[i].first->send(msg.c_str(), msg.length()) != sf::Socket::Done)
+							for (int i = 0; i < socks.size(); i++) {
+								if (socks[i].first->send(sendPack) != sf::Socket::Done)
 									cout << "No se pudo enviar desconexion al Socket " << i << endl;
 								else
 									cout << "Se envia desconexión al player " << i << " - " << socks[i].second.nick << endl;
 
 							}
 							msg = "";
+							pck.clear();
+							sendPack.clear();
 							break;
 						}
 					}
