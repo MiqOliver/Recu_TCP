@@ -25,6 +25,8 @@ namespace graphics {
 
 	#define BOSS "../../rsc/sprites/boss.png"
 
+	#define BUTTON "../../rsc/sprites/button.png"
+
 	#define NUMBER_2 "../../rsc/sprites/number_2.png"
 	#define NUMBER_3 "../../rsc/sprites/number_3.png"
 	#define NUMBER_4 "../../rsc/sprites/number_4.png"

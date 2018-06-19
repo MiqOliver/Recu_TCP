@@ -6,7 +6,9 @@
 #include <thread>
 #include <mutex>
 #include <iostream>
-#include <Utils.hpp>
+#include "Utils.hpp"
+//#include <Utils.hpp>
+#include "Button.hpp"
 
 using namespace utils;
 using namespace std;
@@ -334,6 +336,28 @@ public:
 		aSeparator.setFillColor(sf::Color(200, 200, 200, 255));
 		aSeparator.setPosition(0, 300);
 
+		Button buttons[4];
+
+		for (int i = 0; i < 4; i++) {
+			buttons[i].window = &window;
+			buttons[i].id = i;
+			buttons[i].texture.loadFromFile(BUTTON);
+
+			buttons[i].sprite.setTexture(buttons[i].texture);
+			buttons[i].sprite.setScale(sf::Vector2f(0.75f, 0.5f));
+		}
+		buttons[0].rect = new sf::IntRect(sf::Vector2i(20, 300), sf::Vector2i(200, 35));
+		buttons[0].sprite.setPosition(buttons[0].rect->left, buttons[0].rect->top);
+
+		buttons[1].rect = new sf::IntRect(sf::Vector2i(250, 300), sf::Vector2i(200, 35));
+		buttons[1].sprite.setPosition(buttons[1].rect->left, buttons[1].rect->top);
+		
+		buttons[2].rect = new sf::IntRect(sf::Vector2i(20, 375), sf::Vector2i(200, 35));
+		buttons[2].sprite.setPosition(buttons[2].rect->left, buttons[2].rect->top);
+		
+		buttons[3].rect = new sf::IntRect(sf::Vector2i(250, 375), sf::Vector2i(200, 35));
+		buttons[3].sprite.setPosition(buttons[3].rect->left, buttons[3].rect->top);
+
 		// VIDEOGAME DISPLAY
 		sf::Texture bgTex;
 		sf::Sprite bgSprite;
@@ -444,6 +468,14 @@ public:
 					else if (evento.text.unicode == 8 && mensaje.getSize() > 0)
 						mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
 					break;
+				case sf::Event::MouseButtonPressed:
+					for (int i = 0; i < 4; i++) {
+						if (buttons[i].MouseContact())
+							std::cout << "Button " << buttons[i].id << " was pressed" << std::endl;
+					}
+					break;
+				default:
+					break;
 				}
 			}
 #pragma endregion
@@ -484,6 +516,9 @@ public:
 
 #pragma region DrawAction
 			window.draw(aSeparator);
+
+			for (int i = 0; i < 4; i++)
+				window.draw(buttons[i].sprite);
 #pragma endregion
 
 #pragma region DrawMessages
