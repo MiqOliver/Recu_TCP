@@ -1,6 +1,7 @@
 #pragma once
 #include <mutex>
 #include <vector>
+#include "Player.hpp"
 
 using namespace std;
 
@@ -9,18 +10,20 @@ namespace graphics {
 	#define SCREEN_WIDTH 800
 	#define SCREEN_HEIGHT 600
 
-	#define MAP_0 "../../rsc/sprites/map_0.png"
-	#define MAP_1 "../../rsc/sprites/map_1.png"
-	#define MAP_2 "../../rsc/sprites/map_2.png"
-	#define MAP_3 "../../rsc/sprites/map_3.png"
-	#define MAP_4 "../../rsc/sprites/map_4.png"
-	#define MAP_5 "../../rsc/sprites/map_5.png"
+	#define BG1 "../../rsc/sprites/bg1.png"
+	#define BG2 "../../rsc/sprites/bg2.png"
 
-	#define RES_1 "../../rsc/sprites/res_1.png"
-	#define RES_2 "../../rsc/sprites/res_2.png"
-	#define RES_3 "../../rsc/sprites/res_3.png"
-	#define RES_4 "../../rsc/sprites/res_4.png"
-	#define RES_5 "../../rsc/sprites/res_5.png"
+	#define PERFIL_1 "../../rsc/sprites/perfil1.png"
+	#define PERFIL_2 "../../rsc/sprites/perfil2.png"
+	#define PERFIL_3 "../../rsc/sprites/perfil3.png"
+	#define PERFIL_4 "../../rsc/sprites/perfil4.png"
+
+	#define PLAYER_1 "../../rsc/sprites/player1.png"
+	#define PLAYER_2 "../../rsc/sprites/player2.png"
+	#define PLAYER_3 "../../rsc/sprites/player3.png"
+	#define PLAYER_4 "../../rsc/sprites/player4.png"
+
+	#define BOSS "../../rsc/sprites/boss.png"
 
 	#define NUMBER_2 "../../rsc/sprites/number_2.png"
 	#define NUMBER_3 "../../rsc/sprites/number_3.png"
@@ -56,6 +59,8 @@ namespace utils {
 
 	Protocol prot;
 
+	vector<Player*> players;
+
 	#define PORT 5000
 	#define MAX_PLAYERS 4
 	#define MAX_MENSAJES 30
@@ -82,4 +87,11 @@ namespace utils {
 	#define COLOR_1 sf::Color(160, 0, 0) 
 	#define COLOR_2 sf::Color(200, 200, 200)
 	#define OTHER_COLOR sf::Color(200, 200, 200)
+	#define DIE_COLOR sf::Color(50, 50, 50)
+	#define HP_COLOR sf::Color(76, 187, 23)
+	#define MANA_COLOR sf::Color(15, 82, 186)
+	#define BLACK sf::Color(0, 0, 0)
+
+	#define POS_Y 245
+	#define POS_Y_TURN 215
 }

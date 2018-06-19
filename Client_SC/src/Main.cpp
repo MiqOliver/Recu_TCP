@@ -19,8 +19,7 @@ void main() {
 
 	// Copia del mundo necesaria para el cliente
 	// Los parametros de players y el mismo, junto a los del enemigo. No guarda direcciones.
-	vector<Player> players;
-	Player myPlayer = Player();
+	vector<Player*> players;
 	Enemy myEnemy;
 
 	nick = "";
@@ -43,13 +42,10 @@ void main() {
 			Protocol prot = (Protocol)x;
 			// Se intercambia datos iniciales con otros jugadores
 			for (int i = 0; i < MAX_PLAYERS; i++) {
-				Player newPlayer = Player();
-				pck >> newPlayer.nick >> newPlayer.id >> newPlayer.life >> newPlayer.attack >> newPlayer.mAttack;
-				cout << i << " - Player: " << newPlayer.nick << " - " << newPlayer.id << endl;
-				if (newPlayer.nick == nick)
-					myPlayer = newPlayer;
-				else
-					players.push_back(newPlayer);
+				Player* newPlayer = new Player();
+				pck >> newPlayer->nick >> newPlayer->id >> newPlayer->life >> newPlayer->attack >> newPlayer->mAttack;
+				cout << i << " - Player: " << newPlayer->nick << " - " << newPlayer->id << endl;
+				players.push_back(newPlayer);
 			}
 			pck.clear();
 		}
@@ -82,7 +78,7 @@ void main() {
 	pck.clear();
 #pragma endregion
 
-	Game myGame = Game(&sock);
+	Game myGame = Game(&sock, players);
 
 	myGame.Run();
 	

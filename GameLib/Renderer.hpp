@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "Utils.hpp"
 #include "../../deps64/include/SFML/Graphics.hpp"
 
@@ -331,3 +331,4 @@ private:
 
 #pragma endregion
 };
+*/
