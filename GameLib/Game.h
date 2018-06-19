@@ -45,7 +45,7 @@ public:
 					myPacket >> message.first >> message.second;
 					mu.lock();
 					aMsj->push_back(message);
-					if (aMsj->size() > 25) {
+					if (aMsj->size() > 12) {
 						aMsj->erase(aMsj->begin(), aMsj->begin() + 1);
 					}
 					message.first = "";
@@ -90,17 +90,25 @@ public:
 
 		sf::String mensaje = " > ";
 
-		sf::Text chattingText(mensaje, font, 14);
+		// CHAT DISPLAY
+		sf::RectangleShape titleSeparator(sf::Vector2f(800, 12));
+		titleSeparator.setFillColor(sf::Color(200, 200, 200, 255));
+		titleSeparator.setPosition(0, 438);
+
+		sf::Text title("PUBLIC CHAT", font, 10);
+		title.setFillColor(sf::Color(0, 0, 0));
+		title.setPosition(375, 438);
+
+		sf::Text chattingText(mensaje, font, 10);
 		chattingText.setFillColor(sf::Color(0, 160, 0));
 
-
-		sf::Text text(mensaje, font, 14);
-		text.setFillColor(sf::Color(0, 160, 0));
-		text.setPosition(0, 560);
-
-		sf::RectangleShape separator(sf::Vector2f(800, 5));
+		sf::RectangleShape separator(sf::Vector2f(800, 3));
 		separator.setFillColor(sf::Color(200, 200, 200, 255));
-		separator.setPosition(0, 550);
+		separator.setPosition(0, 577);
+
+		sf::Text text(mensaje, font, 10);
+		text.setFillColor(sf::Color(0, 160, 0));
+		text.setPosition(0, 583);
 #pragma endregion
 
 #pragma region InteractionLoop
@@ -152,6 +160,8 @@ public:
 					break;
 				}
 			}
+			window.draw(titleSeparator);
+			window.draw(title);
 			window.draw(separator);
 #pragma endregion
 
@@ -159,7 +169,7 @@ public:
 			for (size_t i = 0; i < aMensajes.size(); i++) {
 				string chatting = aMensajes[i].first;
 				chatting += aMensajes[i].second;
-				chattingText.setPosition(sf::Vector2f(0, 20 * (float)i));
+				chattingText.setPosition(sf::Vector2f(0, 452 + (10 * (float)i)));
 				chattingText.setString(chatting);
 				if (aMensajes[i].first == nick) {
 					chattingText.setFillColor(MINE_COLOR);

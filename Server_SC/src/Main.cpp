@@ -95,6 +95,7 @@ int main() {
 			for (int i = 0; i < socks.size(); i++) {
 				if (selector.isReady(*socks[i].first)) {
 					sf::Packet myPack;
+					sf::Packet sendPack;
 					sf::Socket::Status status = socks[i].first->receive(myPack);
 					if (status == sf::Socket::NotReady) {
 						break;
@@ -103,7 +104,6 @@ int main() {
 						int p;
 						myPack >> p;
 						prot = (Protocol)p;
-						sf::Packet sendPack;
 						int num = 6;
 						switch (prot) {
 						case CONSTRUCTION:
@@ -129,8 +129,8 @@ int main() {
 							break;
 						case DISCONNECT:
 							prot = MSG;
-							msg = "El jugador " + std::to_string(i) + " - " + socks[i].second.nick + " se ha desconectado.";
-							sendPack << (int)prot << msg;
+							msg = " se ha desconectado.";
+							sendPack << (int)prot << socks[i].second.nick << msg;
 
 							selector.remove(*socks[i].first);
 							socks[i].first->disconnect();
@@ -150,17 +150,24 @@ int main() {
 						}
 					}
 					else if (status == sf::Socket::Disconnected) {
-						msg = "El jugador " + std::to_string(i) + " - " + socks[i].second.nick + " se ha desconectado.";
+						prot = MSG;
+						msg = " se ha desconectado.";
+						sendPack << (int)prot << socks[i].second.nick << msg;
 
 						selector.remove(*socks[i].first);
 						socks[i].first->disconnect();
 						socks.erase(socks.begin() + i);
 						std::cout << "Elimino el socket que se ha desconectado" << endl;
-						for each (pair<sf::TcpSocket*, Player> s in socks) {
-							s.first->send(msg.c_str(), msg.length());
-							std::cout << "Se envia desconexión al player " << s.second.id << " - " << s.second.nick << endl;
+						for (int i = 0; i < socks.size(); i++) {
+							if (socks[i].first->send(sendPack) != sf::Socket::Done)
+								cout << "No se pudo enviar desconexion al Socket " << i << endl;
+							else
+								cout << "Se envia desconexión al player " << i << " - " << socks[i].second.nick << endl;
+
 						}
 						msg = "";
+						pck.clear();
+						sendPack.clear();
 						break;
 					}
 					else {
