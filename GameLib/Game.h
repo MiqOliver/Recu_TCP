@@ -344,19 +344,49 @@ public:
 			buttons[i].texture.loadFromFile(BUTTON);
 
 			buttons[i].sprite.setTexture(buttons[i].texture);
-			buttons[i].sprite.setScale(sf::Vector2f(0.75f, 0.5f));
 		}
-		buttons[0].rect = new sf::IntRect(sf::Vector2i(20, 300), sf::Vector2i(200, 35));
+		buttons[0].rect = new sf::IntRect(sf::Vector2i(30, 320), sf::Vector2i(160, 50));
 		buttons[0].sprite.setPosition(buttons[0].rect->left, buttons[0].rect->top);
 
-		buttons[1].rect = new sf::IntRect(sf::Vector2i(250, 300), sf::Vector2i(200, 35));
+		buttons[1].rect = new sf::IntRect(sf::Vector2i(220, 320), sf::Vector2i(160, 50));
 		buttons[1].sprite.setPosition(buttons[1].rect->left, buttons[1].rect->top);
 		
-		buttons[2].rect = new sf::IntRect(sf::Vector2i(20, 375), sf::Vector2i(200, 35));
+		buttons[2].rect = new sf::IntRect(sf::Vector2i(30, 375), sf::Vector2i(160, 50));
 		buttons[2].sprite.setPosition(buttons[2].rect->left, buttons[2].rect->top);
 		
-		buttons[3].rect = new sf::IntRect(sf::Vector2i(250, 375), sf::Vector2i(200, 35));
+		buttons[3].rect = new sf::IntRect(sf::Vector2i(220, 375), sf::Vector2i(160, 50));
 		buttons[3].sprite.setPosition(buttons[3].rect->left, buttons[3].rect->top);
+
+		sf::Text buttonText[4];
+
+		switch (myID)
+		{
+		case 0:
+			buttonText[0] = sf::Text("TACKLE", font, 20);
+			buttonText[0].setFillColor(sf::Color(20, 20, 20));
+			buttonText[0].setPosition(72, 332);
+
+			buttonText[1] = sf::Text("SLASH", font, 20);
+			buttonText[1].setFillColor(sf::Color(20, 20, 20));
+			buttonText[1].setPosition(270, 332);
+
+			buttonText[2] = sf::Text("FIRST AID", font, 20);
+			buttonText[2].setFillColor(sf::Color(20, 20, 20));
+			buttonText[2].setPosition(55, 387);
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		default:
+			break;
+		}
+
+		buttonText[3] = sf::Text("GUARD", font, 20);
+		buttonText[3].setFillColor(sf::Color(20, 20, 20));
+		buttonText[3].setPosition(270, 387);
 
 		// VIDEOGAME DISPLAY
 		sf::Texture bgTex;
@@ -484,6 +514,7 @@ public:
 			window.draw(bgSprite);
 			window.draw(pSeparator);
 			window.draw(bossSprite);
+			window.draw(aSeparator);
 			for (int i = 0; i < 4; i++) {
 				hpBar[i].setSize(sf::Vector2f(players[i]->life, 15));
 				manaBar[i].setSize(sf::Vector2f(players[i]->mana, 15));
@@ -510,15 +541,10 @@ public:
 				window.draw(perfilSprite[i]);
 				window.draw(perfilName[i]);
 				window.draw(playerSprite[i]);
+				window.draw(buttons[i].sprite);
+				window.draw(buttonText[i]);
 			}
 
-#pragma endregion
-
-#pragma region DrawAction
-			window.draw(aSeparator);
-
-			for (int i = 0; i < 4; i++)
-				window.draw(buttons[i].sprite);
 #pragma endregion
 
 #pragma region DrawMessages

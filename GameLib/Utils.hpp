@@ -58,6 +58,7 @@ namespace utils {
 	std::string msg = "";
 	static bool myTurn = false;
 	static int playerTurn = 0;
+	static int myID;
 
 	Protocol prot;
 

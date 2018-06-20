@@ -45,6 +45,9 @@ void main() {
 				Player* newPlayer = new Player();
 				pck >> newPlayer->nick >> newPlayer->id >> newPlayer->life >> newPlayer->attack >> newPlayer->mAttack;
 				cout << i << " - Player: " << newPlayer->nick << " - " << newPlayer->id << endl;
+				if (newPlayer->nick == nick) {
+					myID = i;
+				}
 				players.push_back(newPlayer);
 			}
 			pck.clear();
