@@ -43,6 +43,7 @@ void main() {
 				peers >> dir[i].nick >> dir[i].ip >> dir[i].port;
 				if (auxSock->connect(ip, dir[i].port) != sf::Socket::Done) {
 					cout << "Imposible conectar al peer: " << i << endl;
+					delete auxSock;
 				}
 				else {
 					cout << "Conexion con exito al peer: " << i << endl;
