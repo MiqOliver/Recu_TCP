@@ -9,6 +9,15 @@
 using namespace std;
 using namespace utils;
 
+//void PasaTurno(vector<pair<sf::TcpSocket*, Player>> socks) {
+//	playerTurn++;
+//	if (playerTurn > 3) {
+//		playerTurn = 0;
+//	}
+//	if (!players[playerTurn]->alive)
+//		PasaTurno();
+//}
+
 int main() {
 
 	sf::Packet pck;
@@ -19,13 +28,13 @@ int main() {
 	pair<string, string> message;
 	vector<pair<string, string>> aMsj;
 
-#pragma region Connection
-	//ESTABLECER CONEXION
-
 	// Copia del mundo (Los atributos de Player y de Enemy)
 	vector<pair<sf::TcpSocket*, Player>> socks;
-	Enemy myEnemy = Enemy();
+	myEnemy = new Enemy();
+	playerTurn = 0;
 
+#pragma region Connection
+	//ESTABLECER CONEXION
 	//Ponemos el listener a escuchar por el puerto
 	if (listener.listen(PORT) != sf::Socket::Done) {
 		cout << "No se puede vincular al puerto 5000" << endl;
@@ -57,7 +66,7 @@ int main() {
 		prot = INFOPLAYER;
 		pck << (int)prot;
 		for (int j = 0; j < socks.size(); j++) {
-			pck << socks[j].second.nick << socks[j].second.id << socks[j].second.life << socks[j].second.attack << socks[j].second.mAttack;
+			pck << socks[j].second.nick << socks[j].second.id << socks[j].second.life << socks[j].second.attack << socks[j].second.mAttack << socks[j].second.defense << socks[j].second.mDefense;
 		}
 		if (socks[i].first->send(pck) != sf::Socket::Done)
 			cout << "No se pudo enviar la informacion de players al Socket " << i << endl;
@@ -69,7 +78,7 @@ int main() {
 	// El servidor indica la situación inicial
 	for (int i = 0; i < socks.size(); i++) {
 		prot = INFOENEMY;
-		pck << (int)prot << myEnemy.life << myEnemy.attack << myEnemy.mAttack;
+		pck << (int)prot << myEnemy->life << myEnemy->attack << myEnemy->mAttack;
 		if (socks[i].first->send(pck) != sf::Socket::Done)
 			cout << "No se pudo enviar la informacion del enemigo al Socket " << i << endl;
 		else
@@ -104,9 +113,37 @@ int main() {
 						int p;
 						myPack >> p;
 						prot = (Protocol)p;
-						int num = 6;
+						int _id = 0;
+						int action = 0;
 						switch (prot) {
-						case CONSTRUCTION:
+						case ACTION:
+							myPack >> action;
+							socks[i].second.Attack(action, myEnemy);
+							_id = playerTurn;
+							//PasaTurno
+							do {
+								playerTurn++;
+								if (playerTurn > socks.size() - 1) {
+									playerTurn = 0;
+									int dmg = myEnemy->attack - socks[_id].second.defense;
+									if (dmg < 0)
+										dmg = 0;
+									socks[_id].second.life -= dmg;
+								}
+							} while (!socks[playerTurn].second.alive);
+
+							sendPack << (int)prot << _id << socks[_id].second.life << socks[_id].second.mana << socks[_id].second.defense << myEnemy->life << (int)socks[playerTurn].second.id;
+							for (int j = 0; j < socks.size(); j++) {
+								if (socks[j].first->send(sendPack) != sf::Socket::Done)
+									cout << "No se pudo enviar la accion al Socket " << j << endl;
+								else
+									cout << "Accion enviada al Socket " << j << endl;
+							}
+							myPack.clear();
+							sendPack.clear();
+
+
+
 							break;
 						case MSG:
 							myPack >> message.first >> message.second;
@@ -116,11 +153,11 @@ int main() {
 							}
 							//cout << "Mensaje: " << message.first << " - " << message.second << " - " << (int)prot << endl;
 							sendPack << (int)prot << message.first << message.second;
-							for (int i = 0; i < socks.size(); i++) {
-								if (socks[i].first->send(myPack) != sf::Socket::Done)
-									cout << "No se pudo enviar el mensaje al Socket " << i << endl;
+							for (int j = 0; j < socks.size(); j++) {
+								if (socks[j].first->send(myPack) != sf::Socket::Done)
+									cout << "No se pudo enviar el mensaje al Socket " << j << endl;
 								else
-									cout << "Mensaje enviado al Socket " << i << endl;
+									cout << "Mensaje enviado al Socket " << j << endl;
 							}
 							message.first = "";
 							message.second = "";
@@ -136,14 +173,21 @@ int main() {
 							socks[i].first->disconnect();
 							socks.erase(socks.begin() + i);
 							std::cout << "Elimino el socket que se ha desconectado" << endl;
-							for (int i = 0; i < socks.size(); i++) {
-								if (socks[i].first->send(sendPack) != sf::Socket::Done)
-									cout << "No se pudo enviar desconexion al Socket " << i << endl;
+							for (int j = 0; j < socks.size(); j++) {
+								if (socks[j].first->send(sendPack) != sf::Socket::Done)
+									cout << "No se pudo enviar desconexion al Socket " << j << endl;
 								else
-									cout << "Se envia desconexión al player " << i << " - " << socks[i].second.nick << endl;
+									cout << "Se envia desconexión al player " << j << " - " << socks[j].second.nick << endl;
 
 							}
 							msg = "";
+
+							do {
+								playerTurn++;
+								if (playerTurn > socks.size() - 1) {
+									playerTurn = 0;
+								}
+							} while (!socks[playerTurn].second.alive);
 							pck.clear();
 							sendPack.clear();
 							break;
@@ -158,14 +202,22 @@ int main() {
 						socks[i].first->disconnect();
 						socks.erase(socks.begin() + i);
 						std::cout << "Elimino el socket que se ha desconectado" << endl;
-						for (int i = 0; i < socks.size(); i++) {
-							if (socks[i].first->send(sendPack) != sf::Socket::Done)
-								cout << "No se pudo enviar desconexion al Socket " << i << endl;
+						for (int j = 0; j < socks.size(); j++) {
+							if (socks[j].first->send(sendPack) != sf::Socket::Done)
+								cout << "No se pudo enviar desconexion al Socket " << j << endl;
 							else
-								cout << "Se envia desconexión al player " << i << " - " << socks[i].second.nick << endl;
+								cout << "Se envia desconexión al player " << j << " - " << socks[j].second.nick << endl;
 
 						}
 						msg = "";
+
+						do {
+							playerTurn++;
+							if (playerTurn > socks.size() - 1) {
+								playerTurn = 0;
+							}
+						} while (!socks[playerTurn].second.alive);
+
 						pck.clear();
 						sendPack.clear();
 						break;

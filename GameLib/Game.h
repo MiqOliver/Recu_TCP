@@ -21,7 +21,7 @@ public:
 	sf::Packet myPacket;
 	size_t receivedLength;
 
-	Receptor_Threading(sf::TcpSocket* sock, vector<pair<string, string>>* aMsj) : sock(sock),
+	Receptor_Threading(sf::TcpSocket* sock, vector<pair<string, string>>* aMsj, vector<Player*> aPlayers) : sock(sock),
 		aMsj(aMsj) {
 	}
 
@@ -36,11 +36,15 @@ public:
 			else {
 				int x = 0;
 				myPacket >> x;
+				int _id = -1;
 				Protocol prot = (Protocol)x;
-				cout << (int)prot << endl;
 				switch (prot)
 				{
-				case utils::TURN:
+				case utils::ACTION:
+					myPacket >> _id;
+					myPacket >> players[_id]->life >> players[_id]->mana >> players[_id]->defense;
+					myPacket >> myEnemy->life;
+					myPacket >> playerTurn;
 					break;
 				case utils::MSG:
 					cout << "Mensaje recibido" << endl;
@@ -83,7 +87,7 @@ public:
 		vector<pair<string, string>> aMensajes;
 		pair<string, string> message;
 		string messageSend;
-		Receptor_Threading r(socket, &aMensajes);
+		Receptor_Threading r(socket, &aMensajes, players);
 		sf::Packet myPacket;
 		thread t(r);
 
@@ -91,7 +95,7 @@ public:
 		sf::Vector2i screenDimensions(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		sf::RenderWindow window;
-		window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
+		window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "RPG - " + nick);
 
 		sf::Font font;
 		if (!font.loadFromFile("courbd.ttf")) {
@@ -375,10 +379,43 @@ public:
 			buttonText[2].setPosition(55, 387);
 			break;
 		case 1:
+			buttonText[0] = sf::Text("SHOOT", font, 20);
+			buttonText[0].setFillColor(sf::Color(20, 20, 20));
+			buttonText[0].setPosition(80, 332);
+
+			buttonText[1] = sf::Text("ENVENOM", font, 20);
+			buttonText[1].setFillColor(sf::Color(20, 20, 20));
+			buttonText[1].setPosition(258, 332);
+
+			buttonText[2] = sf::Text("FLEE", font, 20);
+			buttonText[2].setFillColor(sf::Color(20, 20, 20));
+			buttonText[2].setPosition(86, 387);
 			break;
 		case 2:
+			buttonText[0] = sf::Text("BASH", font, 20);
+			buttonText[0].setFillColor(sf::Color(20, 20, 20));
+			buttonText[0].setPosition(86, 332);
+
+			buttonText[1] = sf::Text("DIVINE CROSS", font, 15);
+			buttonText[1].setFillColor(sf::Color(20, 20, 20));
+			buttonText[1].setPosition(245, 335);
+
+			buttonText[2] = sf::Text("THROW SHIELD", font, 15);
+			buttonText[2].setFillColor(sf::Color(20, 20, 20));
+			buttonText[2].setPosition(55, 390);
 			break;
 		case 3:
+			buttonText[0] = sf::Text("MAGIC ROD", font, 19);
+			buttonText[0].setFillColor(sf::Color(20, 20, 20));
+			buttonText[0].setPosition(59, 332);
+
+			buttonText[1] = sf::Text("FIREBALL", font, 20);
+			buttonText[1].setFillColor(sf::Color(20, 20, 20));
+			buttonText[1].setPosition(253, 332);
+
+			buttonText[2] = sf::Text("SOUL SIPHON", font, 15);
+			buttonText[2].setFillColor(sf::Color(20, 20, 20));
+			buttonText[2].setPosition(60, 390);
 			break;
 		default:
 			break;
@@ -429,6 +466,19 @@ public:
 		playerSprite[3].setScale(sf::Vector2f(1.5, 1.5));
 
 		bossSprite.setScale(sf::Vector2f(0.95, 0.95));
+
+		sf::RectangleShape hpBoss;
+		sf::RectangleShape hpBossBg;
+
+		hpBossBg = sf::RectangleShape(sf::Vector2f((myEnemy->life / 4), 15));
+		hpBossBg.setFillColor(BLACK);
+		hpBossBg.setOutlineThickness(1);
+		hpBossBg.setPosition(100, 2);
+
+		hpBoss = sf::RectangleShape(sf::Vector2f((myEnemy->life / 4), 15));
+		hpBoss.setFillColor(RED);
+		hpBoss.setPosition(100, 2);
+
 
 		// CHAT DISPLAY
 		sf::RectangleShape titleSeparator(sf::Vector2f(800, 12));
@@ -499,9 +549,24 @@ public:
 						mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
 					break;
 				case sf::Event::MouseButtonPressed:
-					for (int i = 0; i < 4; i++) {
-						if (buttons[i].MouseContact())
-							std::cout << "Button " << buttons[i].id << " was pressed" << std::endl;
+					if (myID == playerTurn) {
+						for (int i = 0; i < 4; i++) {
+							if (buttons[i].MouseContact()) {
+								if (!((i == 1 || i == 2) && players[myID]->mana < 20)) {
+									myPacket.clear();
+									std::cout << "Button " << buttons[i].id << " was pressed" << std::endl;
+									prot = ACTION;
+									myPacket << (int)prot << i;
+
+									sf::Socket::Status status = socket->send(myPacket);
+									if (status != sf::Socket::Done) {
+										cout << "Ha fallado el envio de datos\n";
+									}
+									myPacket.clear();
+									playerTurn = -1;
+								}
+							}
+						}
 					}
 					break;
 				default:
@@ -514,10 +579,28 @@ public:
 			window.draw(bgSprite);
 			window.draw(pSeparator);
 			window.draw(bossSprite);
+			window.draw(hpBossBg);
+			hpBoss.setSize(sf::Vector2f((myEnemy->life / 4), 15));
+			window.draw(hpBoss);
 			window.draw(aSeparator);
+			if (myID != playerTurn) {
+				buttons[0].sprite.setColor(DIE_COLOR);
+				buttons[1].sprite.setColor(DIE_COLOR);
+				buttons[2].sprite.setColor(DIE_COLOR);
+				buttons[3].sprite.setColor(DIE_COLOR);
+			}
+			else {
+				buttons[0].sprite.setColor(WHITE);
+				if (players[myID]->mana >= 20) {
+					buttons[1].sprite.setColor(WHITE);
+					buttons[2].sprite.setColor(WHITE);
+				}
+				buttons[3].sprite.setColor(WHITE);
+			}
 			for (int i = 0; i < 4; i++) {
 				hpBar[i].setSize(sf::Vector2f(players[i]->life, 15));
 				manaBar[i].setSize(sf::Vector2f(players[i]->mana, 15));
+				defenseText[i].setString("Defense: " + to_string(players[i]->defense));
 				if (!players[i]->alive) {
 					perfilSprite[i].setColor(DIE_COLOR);
 					playerSprite[i].setColor(DIE_COLOR);

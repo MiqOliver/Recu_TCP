@@ -44,7 +44,7 @@ namespace graphics {
 namespace utils {
 
 	enum Protocol { INFOPLAYER, INFOENEMY, START, TURN, 
-		MSG, DEAL, RESOURCES, CONSTRUCTION, POINTS, LOGRO, ENDTURN, 
+		MSG, ACTION, RESOURCES, CONSTRUCTION, POINTS, LOGRO, ENDTURN, 
 		CONNECTIONFAILURE, STRUCTURES, CARDS, ENDGAME, ERROR, DISCONNECT };
 
 	enum Resource { WOOD, SHEEP, STRAW, STEEL, CLAY, DESERT };
@@ -52,17 +52,19 @@ namespace utils {
 	enum Structures { TOWN, CITY, BRIDGE, NONE };
 
 	static std::mutex mu;
+	static std::mutex ma;
 	static std::string nick;
 
 	static bool end = false;
 	std::string msg = "";
 	static bool myTurn = false;
-	static int playerTurn = 0;
+	int playerTurn = 0;
 	static int myID;
 
 	Protocol prot;
 
 	vector<Player*> players;
+	Enemy* myEnemy;
 
 	#define PORT 5000
 	#define MAX_PLAYERS 4
@@ -94,6 +96,8 @@ namespace utils {
 	#define HP_COLOR sf::Color(76, 187, 23)
 	#define MANA_COLOR sf::Color(15, 82, 186)
 	#define BLACK sf::Color(0, 0, 0)
+	#define WHITE sf::Color(255, 255, 255)
+	#define RED sf::Color(203, 32, 39)
 
 	#define POS_Y 245
 	#define POS_Y_TURN 215

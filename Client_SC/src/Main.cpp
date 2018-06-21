@@ -20,7 +20,7 @@ void main() {
 	// Copia del mundo necesaria para el cliente
 	// Los parametros de players y el mismo, junto a los del enemigo. No guarda direcciones.
 	vector<Player*> players;
-	Enemy myEnemy;
+	myEnemy = new Enemy();
 
 	nick = "";
 	std::cout << "Enter your NickName:" << endl;
@@ -43,7 +43,7 @@ void main() {
 			// Se intercambia datos iniciales con otros jugadores
 			for (int i = 0; i < MAX_PLAYERS; i++) {
 				Player* newPlayer = new Player();
-				pck >> newPlayer->nick >> newPlayer->id >> newPlayer->life >> newPlayer->attack >> newPlayer->mAttack;
+				pck >> newPlayer->nick >> newPlayer->id >> newPlayer->life >> newPlayer->attack >> newPlayer->mAttack >> newPlayer->defense >> newPlayer->mDefense;
 				cout << i << " - Player: " << newPlayer->nick << " - " << newPlayer->id << endl;
 				if (newPlayer->nick == nick) {
 					myID = i;
@@ -63,7 +63,7 @@ void main() {
 		int x;
 		pck >> x;
 		Protocol prot = (Protocol)x;
-		pck >> myEnemy.life >> myEnemy.attack >> myEnemy.mAttack;
+		pck >> myEnemy->life >> myEnemy->attack >> myEnemy->mAttack;
 		cout << "Enemigo Recibido!" << endl;
 	}
 	pck.clear();
