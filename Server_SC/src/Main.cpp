@@ -119,20 +119,30 @@ int main() {
 						case ACTION:
 							myPack >> action;
 							socks[i].second.Attack(action, myEnemy);
-							_id = playerTurn;
-							//PasaTurno
-							do {
-								playerTurn++;
-								if (playerTurn > socks.size() - 1) {
-									playerTurn = 0;
-									int dmg = myEnemy->attack - socks[_id].second.defense;
-									if (dmg < 0)
-										dmg = 0;
-									socks[_id].second.life -= dmg;
-								}
-							} while (!socks[playerTurn].second.alive);
+							if (myEnemy->life <= 0)
+								myEnemy->alive = false;
+							if (myEnemy->alive) {
+								_id = playerTurn;
+								//PasaTurno
+								do {
+									playerTurn++;
+									if (playerTurn > socks.size() - 1) {
+										playerTurn = 0;
+										int dmg = myEnemy->attack - socks[_id].second.defense;
+										if (dmg < 0)
+											dmg = 0;
+										socks[_id].second.life -= dmg;
+										if (socks[_id].second.life <= 0)
+											socks[_id].second.alive = false;
+									}
+								} while (!socks[playerTurn].second.alive);
 
-							sendPack << (int)prot << _id << socks[_id].second.life << socks[_id].second.mana << socks[_id].second.defense << myEnemy->life << (int)socks[playerTurn].second.id;
+								sendPack << (int)prot << _id << socks[_id].second.life << socks[_id].second.mana << socks[_id].second.defense << myEnemy->life << (int)socks[playerTurn].second.id;
+							}
+							else {
+								prot = ENDGAME;
+								sendPack << (int)prot;
+							}
 							for (int j = 0; j < socks.size(); j++) {
 								if (socks[j].first->send(sendPack) != sf::Socket::Done)
 									cout << "No se pudo enviar la accion al Socket " << j << endl;
@@ -141,8 +151,6 @@ int main() {
 							}
 							myPack.clear();
 							sendPack.clear();
-
-
 
 							break;
 						case MSG:
@@ -169,6 +177,16 @@ int main() {
 							msg = " se ha desconectado.";
 							sendPack << (int)prot << socks[i].second.nick << msg;
 
+							if (i == playerTurn) {
+								do {
+									playerTurn++;
+									if (playerTurn > socks.size() - 1) {
+										playerTurn = 0;
+									}
+								} while (!socks[playerTurn].second.alive);
+								sendPack << (int)socks[playerTurn].second.id;
+							}
+
 							selector.remove(*socks[i].first);
 							socks[i].first->disconnect();
 							socks.erase(socks.begin() + i);
@@ -181,13 +199,6 @@ int main() {
 
 							}
 							msg = "";
-
-							do {
-								playerTurn++;
-								if (playerTurn > socks.size() - 1) {
-									playerTurn = 0;
-								}
-							} while (!socks[playerTurn].second.alive);
 							pck.clear();
 							sendPack.clear();
 							break;
@@ -198,6 +209,16 @@ int main() {
 						msg = " se ha desconectado.";
 						sendPack << (int)prot << socks[i].second.nick << msg;
 
+						if (i == playerTurn) {
+							do {
+								playerTurn++;
+								if (playerTurn > socks.size() - 1) {
+									playerTurn = 0;
+								}
+							} while (!socks[playerTurn].second.alive);
+							sendPack << (int)socks[playerTurn].second.id;
+						}
+						
 						selector.remove(*socks[i].first);
 						socks[i].first->disconnect();
 						socks.erase(socks.begin() + i);
@@ -210,16 +231,8 @@ int main() {
 
 						}
 						msg = "";
-
-						do {
-							playerTurn++;
-							if (playerTurn > socks.size() - 1) {
-								playerTurn = 0;
-							}
-						} while (!socks[playerTurn].second.alive);
-
 						pck.clear();
-						sendPack.clear();
+						sendPack.clear();						
 						break;
 					}
 					else {

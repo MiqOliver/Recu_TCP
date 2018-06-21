@@ -45,6 +45,10 @@ public:
 					myPacket >> players[_id]->life >> players[_id]->mana >> players[_id]->defense;
 					myPacket >> myEnemy->life;
 					myPacket >> playerTurn;
+					if (players[_id]->life <= 0) {
+						players[_id]->alive = false;
+						players[_id]->life = 0;
+					}
 					break;
 				case utils::MSG:
 					cout << "Mensaje recibido" << endl;
@@ -60,10 +64,15 @@ public:
 								p->alive = false;
 							}
 						}
+						myPacket >> playerTurn;
 					}
 					message.first = "";
 					message.second = "";
 					mu.unlock();
+					break;
+				case ENDGAME:
+					cout << "ENDGAME" << endl;
+					utils::end = true;
 					break;
 				default:
 					break;
@@ -654,6 +663,11 @@ public:
 
 			window.display();
 			window.clear();
+
+			// ENG GAME
+			if (utils::end == true) {
+				window.close();
+			}
 		}
 
 		t.join();

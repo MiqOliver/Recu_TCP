@@ -84,9 +84,16 @@ void main() {
 	Game myGame = Game(&sock, players);
 
 	myGame.Run();
+
+	if (utils::end) {
+		system("cls");
+		cout << "YOU DEFEATED THE BOSS!!" << endl;
+		system("pause");
+	}
 	
 #pragma region Disconnect
 	sf::Packet chaoPck;
+	prot = DISCONNECT;
 	chaoPck << (int)prot;
 	if (sock.send(chaoPck) != sf::Socket::Done)
 		cout << "No se pudo enviar la desconexion al Server" << endl;
