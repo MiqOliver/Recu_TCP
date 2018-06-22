@@ -90,6 +90,12 @@ void main() {
 		cout << "YOU DEFEATED THE BOSS!!" << endl;
 		system("pause");
 	}
+
+	if (utils::lose) {
+		system("cls");
+		cout << "YOU LOSE!!" << endl;
+		system("pause");
+	}
 	
 #pragma region Disconnect
 	sf::Packet chaoPck;

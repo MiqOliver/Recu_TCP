@@ -57,6 +57,7 @@ namespace utils {
 
 	static bool end = false;
 	static bool win = false;
+	static bool lose = false;
 	std::string msg = "";
 	static bool myTurn = false;
 	int playerTurn = 0;

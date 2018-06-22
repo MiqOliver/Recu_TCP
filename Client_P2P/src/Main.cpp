@@ -244,6 +244,12 @@ void main() {
 		system("pause");
 	}
 
+	if (utils::lose) {
+		system("cls");
+		cout << "YOU LOSE!!" << endl;
+		system("pause");
+	}
+
 #pragma region Disconnect
 	for each (sf::TcpSocket* s in sock) {
 		s->disconnect();
