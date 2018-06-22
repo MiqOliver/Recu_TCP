@@ -44,12 +44,30 @@ public:
 							switch (prot) {
 							case utils::ACTION:
 								myPacket >> _id;
-								myPacket >> players[_id]->life >> players[_id]->mana >> players[_id]->defense;
-								myPacket >> myEnemy->life;
-								myPacket >> playerTurn;
-								if (players[_id]->life <= 0) {
-									players[_id]->alive = false;
-									players[_id]->life = 0;
+
+								players[i]->Attack(_id, myEnemy);
+								if (myEnemy->life <= 0)
+									myEnemy->alive = false;
+								if (myEnemy->alive) {
+									prot = ACTION;
+									myPacket << (int)prot << i;
+									do {
+										playerTurn++;
+										if (playerTurn > MAX_PLAYERS) {
+											playerTurn = 0;
+											int dmg = myEnemy->attack - players[i]->defense;
+											if (dmg < 0)
+												dmg = 0;
+											players[i]->life -= dmg;
+											if (players[i]->life <= 0)
+												players[i]->alive = false;
+										}
+									} while (!players[playerTurn]->alive);
+								}
+								else {
+									cout << "ENDGAME" << endl;
+									utils::end = true;
+									utils::win = true;
 								}
 								break;
 							case utils::MSG:
@@ -637,20 +655,52 @@ public:
 								if (!((i == 1 || i == 2) && players[myID]->mana < 20)) {
 									myPacket.clear();
 									std::cout << "Button " << buttons[i].id << " was pressed" << std::endl;
-									prot = ACTION;
-									myPacket << (int)prot << i;
 
-									for (int j = 0; j < socket.size(); j++) {
-										if (j != myID) {
-											sf::Socket::Status status = socket[j]->send(myPacket);
-											if (status != sf::Socket::Done) {
-												cout << "Ha fallado el envio de la accion al socket " << j << endl;
+									players[myID]->Attack(i, myEnemy);
+									if (myEnemy->life <= 0)
+										myEnemy->alive = false;
+									if (myEnemy->alive) {
+										prot = ACTION;
+										myPacket << (int)prot << i;
+										do {
+											playerTurn++;
+											if (playerTurn > MAX_PLAYERS) {
+												playerTurn = 0;
+												int dmg = myEnemy->attack - players[i]->defense;
+												if (dmg < 0)
+													dmg = 0;
+												players[i]->life -= dmg;
+												if (players[i]->life <= 0)
+													players[i]->alive = false;
+											}
+										} while (!players[playerTurn]->alive);
+
+										for (int j = 0; j < socket.size(); j++) {
+											if (j != myID) {
+												sf::Socket::Status status = socket[j]->send(myPacket);
+												if (status != sf::Socket::Done) {
+													cout << "Ha fallado el envio de la accion al socket " << j << endl;
+												}
 											}
 										}
 									}
+									else {
+										prot = ENDGAME;
+										myPacket << (int)prot;
+										for (int j = 0; j < socket.size(); j++) {
+											if (j != myID) {
+												sf::Socket::Status status = socket[j]->send(myPacket);
+												if (status != sf::Socket::Done) {
+													cout << "Ha fallado el envio de la accion al socket " << j << endl;
+												}
+											}
+										}
+										cout << "ENDGAME" << endl;
+										utils::end = true;
+										utils::win = true;
+									}
 									myPacket.clear();
-									playerTurn = -1;
-								}
+								}							
 							}
 						}
 					}
