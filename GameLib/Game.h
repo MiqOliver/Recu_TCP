@@ -73,6 +73,7 @@ public:
 				case ENDGAME:
 					cout << "ENDGAME" << endl;
 					utils::end = true;
+					utils::win = true;
 					break;
 				default:
 					break;

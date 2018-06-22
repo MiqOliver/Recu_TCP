@@ -31,7 +31,7 @@ public:
 	}
 
 	void operator() () {
-		while (!utils::end || sock->size() != 0) {
+		while (!utils::end && sock->size() != 0) {
 			if (selector.wait()) {
 				for (int i = 0; i < sock->size(); i++) {
 					if (selector.isReady(*sock->at(i))) {
@@ -55,22 +55,12 @@ public:
 							case utils::MSG:
 								cout << "Mensaje recibido" << endl;
 								myPacket >> message.first >> message.second;
+								
+								//WRITE SCREEN
 								mu.lock();
 								aMsj->push_back(message);
 								if (aMsj->size() > 12) {
 									aMsj->erase(aMsj->begin(), aMsj->begin() + 1);
-								}
-								if (message.second == " se ha desconectado.") {
-									selector.remove(*sock->at(i));
-									sock->at(i)->disconnect();
-									sock->erase(sock->begin() + i);
-									std::cout << "Elimino el socket que se ha desconectado" << endl;
-									for each (Player* p in  players) {
-										if (message.first == p->nick) {
-											p->alive = false;
-										}
-									}
-									//myPacket >> playerTurn;
 								}
 								message.first = "";
 								message.second = "";
@@ -79,16 +69,58 @@ public:
 							case ENDGAME:
 								cout << "ENDGAME" << endl;
 								utils::end = true;
+								utils::win = true;
+								break;
+							case DISCONNECT:
+								mu.lock();
+								message.first = players[i]->nick;
+								message.second = " se ha desconectado.";
+								aMsj->push_back(message);
+								if (aMsj->size() > 12) {
+									aMsj->erase(aMsj->begin(), aMsj->begin() + 1);
+								}
+								message.first = "";
+								message.second = "";
+								mu.unlock();
+
+								selector.remove(*sock->at(i));
+								sock->at(i)->disconnect();
+								sock->erase(sock->begin() + i);
+								std::cout << "Elimino el socket que se ha desconectado - " << i << endl;
+								
+								for each (Player* p in  players) {
+									if (message.first == p->nick) {
+										p->alive = false;
+									}
+								}
 								break;
 							default:
 								break;
 							}
 						}
 						else if (status == sf::Socket::Disconnected) {
+							//WRITE SCREEN
+							mu.lock();
+							message.first = players[i]->nick;
+							message.second = " se ha desconectado.";
+							aMsj->push_back(message);
+							if (aMsj->size() > 12) {
+								aMsj->erase(aMsj->begin(), aMsj->begin() + 1);
+							}
+							message.first = "";
+							message.second = "";
+							mu.unlock();
+
 							selector.remove(*sock->at(i));
 							sock->at(i)->disconnect();
 							sock->erase(sock->begin() + i);
-							std::cout << "Elimino el socket que se ha desconectado" << endl;
+							std::cout << "Elimino el socket que se ha desconectado - " << i << endl;
+
+							for each (Player* p in  players) {
+								if (message.first == p->nick) {
+									p->alive = false;
+								}
+							}
 							break;
 						}
 						else {

@@ -85,7 +85,7 @@ void main() {
 
 	myGame.Run();
 
-	if (utils::end) {
+	if (utils::win) {
 		system("cls");
 		cout << "YOU DEFEATED THE BOSS!!" << endl;
 		system("pause");

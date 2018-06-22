@@ -99,15 +99,10 @@ void main() {
 		}
 	}
 #pragma endregion
-
-	for (int i = 0; i < MAX_PLAYERS; i++)
-		cout << "Player " << i << ": " << aPlayers[i]->nick << " - " << aPlayers[i]->id;
-
+	
 	GameP2P myGame = GameP2P(sock, aPlayers);
 
 	myGame.Run();
-
-
 
 //
 //#pragma region ScreenDisplay
@@ -243,7 +238,7 @@ void main() {
 //	}
 
 
-	if (utils::end) {
+	if (utils::win) {
 		system("cls");
 		cout << "YOU DEFEATED THE BOSS!!" << endl;
 		system("pause");
