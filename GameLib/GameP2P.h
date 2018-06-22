@@ -39,28 +39,27 @@ public:
 						if (status == sf::Socket::Done) {
 							int x = 0;
 							myPacket >> x;
-							int _id = -1;
+							int _id = 0;
+							int num = 0;
 							Protocol prot = (Protocol)x;
 							switch (prot) {
 							case utils::ACTION:
-								myPacket >> _id;
+								myPacket >> _id >> num;
 
-								players[i]->Attack(_id, myEnemy);
+								players[_id]->Attack(num, myEnemy);
 								if (myEnemy->life <= 0)
 									myEnemy->alive = false;
 								if (myEnemy->alive) {
-									prot = ACTION;
-									myPacket << (int)prot << i;
 									do {
 										playerTurn++;
-										if (playerTurn > MAX_PLAYERS) {
+										if (playerTurn > players.size() - 1) {
 											playerTurn = 0;
-											int dmg = myEnemy->attack - players[i]->defense;
+											int dmg = myEnemy->attack - players[_id]->defense;
 											if (dmg < 0)
 												dmg = 0;
-											players[i]->life -= dmg;
-											if (players[i]->life <= 0)
-												players[i]->alive = false;
+											players[_id]->life -= dmg;
+											if (players[_id]->life <= 0)
+												players[_id]->alive = false;
 										}
 									} while (!players[playerTurn]->alive);
 								}
@@ -661,17 +660,17 @@ public:
 										myEnemy->alive = false;
 									if (myEnemy->alive) {
 										prot = ACTION;
-										myPacket << (int)prot << i;
+										myPacket << (int)prot << myID << i;
 										do {
 											playerTurn++;
-											if (playerTurn > MAX_PLAYERS) {
+											if (playerTurn > players.size() - 1) {
 												playerTurn = 0;
-												int dmg = myEnemy->attack - players[i]->defense;
+												int dmg = myEnemy->attack - players[myID]->defense;
 												if (dmg < 0)
 													dmg = 0;
-												players[i]->life -= dmg;
-												if (players[i]->life <= 0)
-													players[i]->alive = false;
+												players[myID]->life -= dmg;
+												if (players[myID]->life <= 0)
+													players[myID]->alive = false;
 											}
 										} while (!players[playerTurn]->alive);
 
