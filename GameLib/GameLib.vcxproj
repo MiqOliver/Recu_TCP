@@ -132,6 +132,7 @@
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Direction.hpp" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameP2P.h" />
     <ClInclude Include="Map.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Receptor.h" />

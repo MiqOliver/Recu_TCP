@@ -18,12 +18,13 @@ void main() {
 		sf::TcpSocket sock;
 		listener.accept(sock);
 		//Nickname
-		char receivedText[MAX_LENGTH];
+		char receivedText[MAX_LENGTH] = { "" };
 		size_t receivedLength;
 		sock.receive(receivedText, MAX_LENGTH, receivedLength);
-		string nick = receivedText;
-		Direction d(nick, sock.getRemoteAddress().toString(), sock.getRemotePort());
-		cout << "Socket " << nick << ": IP - " << d.ip << " PORT - " << d.port << endl;
+		string newNick = "";
+		newNick = receivedText;
+		Direction d(newNick, sock.getRemoteAddress().toString(), sock.getRemotePort());
+		cout << "Socket " << newNick << ": IP - " << d.ip << " PORT - " << d.port << endl;
 
 		sf::Packet pack;
 		pack << i;

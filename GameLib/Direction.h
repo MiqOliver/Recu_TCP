@@ -10,7 +10,7 @@ struct Direction {
 	}
 	Direction() = default;
 
-	std::string nick;
+	std::string nick = "";
 	std::string ip;
 	unsigned short port;
 };
